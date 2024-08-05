@@ -35,13 +35,14 @@ knitr::opts_chunk$set(eval = FALSE)
 
 #
 percent_df <- function(num_of_itterations){
-  #
+  # We pass a specific num_of_itterations and divide by ten, and after we round it to zero digits after dot
   per<-round(num_of_itterations/10,0)
-  #
-  perdf<-data.frame(percent=sapply(seq(10, 100, by=10),function(x){paste(x,"%",sep="")}))
-  #
+  # seq(seq(10, 100, by=10) create vector from with values from 10 to 100 with step = 10
+  # Sapply will apply custom func to every elems of created vector to create strings (10%, 60% and ... )in percent column
+  perdf<-data.frame(percent = sapply(seq(10, 100, by=10),function(x){paste(x,"%",sep="")}))
+  # create new column value with NAs
   perdf$value<-NA
-  #
+  # Iterate 10 times as in seq() func and with this func we return perdf with new values in "value" column where the new value = per*i, where if i = 1, we will create value for first value(row) in perdf for "value" column
   for(i in 1:10){perdf[i,"value"]<-per*i}
   #
   return(perdf)
@@ -61,6 +62,7 @@ percent_print <- function(now_per,itterations_passed,perdf){
 num_of_itterations<-76
 #
 perdf<-percent_df(num_of_itterations)
+perdf
 #
 now_per<-1
 #
@@ -114,10 +116,19 @@ for (i in 1:num_of_itterations){
 # row.names = FALSE does not allow to include row names in text file.
 # sep="\t" indicates tab separator.
 
+data()
+data("mtcars") # we added df mtcars to our environment and we may call it
+data("pressure")
+data(BOD)
+
+write.table(mtcars,"mtcars.tsv",row.names = FALSE, sep = "\t" )
+
+
 ```
 
 ```{r}
 # write.csv() by default sets separator as comma (,) and dot (.) as decimal point.
+write.csv(mtcars,"mtcars.csv", row.names = F)
 
 ```
 
@@ -125,6 +136,7 @@ for (i in 1:num_of_itterations){
 
 ```{r}
 #read file. header=TRUE indicates that first row becomes column names.
+mtcars_fromFile = read.table("mtcars.tsv",sep = "\t", header = TRUE)
 
 ```
 
@@ -134,6 +146,8 @@ for (i in 1:num_of_itterations){
 
 ```{r}
 #data set help
+head(mtcars_fromFile)
+?mtcars
 
 ```
 
@@ -141,14 +155,14 @@ for (i in 1:num_of_itterations){
 
 ```{r}
 # output: number of rows, number of columns
-
+dim(mtcars_fromFile)
 ```
 
 Для першого погляду на дані достатньо побачити назви стовпців і перші/останні рядки.
 
 ```{r}
 # second argument specifies number of rows you want to display (default is 5 rows).
-
+tail(mtcars_fromFile,4)
 ```
 
 ```{r}
@@ -160,14 +174,16 @@ for (i in 1:num_of_itterations){
 
 ```{r}
 # output: column names: data class: first 10 values.
-
+head(mtcars,10)
+str(mtcars)
 ```
 
 А якщо ви хочете досліджувати дані вручну, відображайте їх у повному розмірі.
 
 ```{r}
 # the window will open next to R script.
-
+View(mtcars)
+view()
 ```
 
 Ми хотіли б знати, чи якісь значення відсутні в даних або дублюються.
@@ -176,50 +192,60 @@ for (i in 1:num_of_itterations){
 ```{r}
 # check if there's any NA or NaN values
 # arr.ind	- logical; should array indices be returned when x is an array?
+which(is.na(mtcars),arr.ind = TRUE)
+which(is.na(mtcars),arr.ind = FALSE)
 
 ```
 
 ```{r}
 # check if there blank values (no character)
-
+mtcars[mtcars == ""]
+mtcars == ""
 ```
 
 ```{r}
 #check if there duplicated rows
 # duplicated() determines which elements of a vector or data frame are duplicates.
-
+sum(duplicated(mtcars))
 ```
 
 Якщо ви очікуєте, що будь-який стовпець матиме категоричні значення, перевірте, чи всі категорії присутні й названі правильно, а також кількість рядків, що містять кожну з категорій.
 
 ```{r}
 # unique() removes duplicated elements/rows.
+unique(mtcars$cyl)
+
 
 ```
 Кількість значень кожної категорії можна легко підрахувати...
 
 ```{r}
 # table() builds a contingency table of the counts.
-
+table(mtcars$cyl)
 ```
 
 Також можемо сортувати набір даних за стовпцями.
 
 ```{r}
 #order() returns a rearranged data set with into ascending or descending order.
-
+head(mtcars[order(mtcars$cyl),10])
+order(mtcars$cyl)
+mtcars[order(mtcars$cyl),]
 ```
 
 Ви можете зробити швидку статистичну оцінку ваших даних. Можна перевірити кожен параметр окремо (середнє, мінімальне, максимальне тощо) або всі разом.
 
 ```{r}
 # by parameter
+min(mtcars$mpg)
+max(mtcars$mpg)
+mean(mtcars$mpg)
 
 ```
 
 ```{r}
 # all parameters
-
+summary(mtcars)
 ```
 
 
@@ -239,7 +265,9 @@ R base дозволяє робити прості візуалізації. Ал
 
 ```{r}
 # Scatter plot shows relationship between two sets of numbers. 
+plot(mtcars$wt,mtcars$mpg)
 
+tibble::view(mtcars) 
 ```
 
 *Висновок: ймовірно, залежність між зміними mpg i wt існує. Подальші висновки потребують додаткових обчислень.*
@@ -249,8 +277,16 @@ R base дозволяє робити прості візуалізації. Ал
 ```{r}
 # Line plot are useful when comparing multiple variables.
 # type="l" specifies that line should be plotted
+plot(pressure$temperature,pressure$pressure, type="l") + 
+    points(pressure$temperature, pressure$pressure, col = "red")
+
 
 # add points to see all values.
+
+dev.off
+plot(pressure$temperature,pressure$pressure)
+
+
 
 ```
 
@@ -262,9 +298,13 @@ R base дозволяє робити прості візуалізації. Ал
 # par() can be used to set or query graphical parameters.
 # mfrow - vector of the form c(number of rows, columns).
 
-# hist() plots a histogram, where second argument breaks=20 means to devide the x range into 20 blocks.
-# hist() automatically adds plot title and axis labels.
+par(mfrow = c(1,2)) 
 
+# hist() plots a histogram, where second argument breaks=20 means to devide the x range into 20 blocks.
+
+# hist() automatically adds plot title and axis labels.
+hist(ToothGrowth$len, 20)
+dev.off()
 #dev.off shuts down the specified (by default the current) graphic. If not written, new plots will overdraw the old. Here we commented previous line to display graphics.
 ```
 *Висновок: довжина зубів у кожній групі відрізняється (суттєво чи ні - справа статистичних тестів). Найчастіше зустрічаються зуби в діапозоні 25-30 мм.* 
@@ -273,8 +313,12 @@ R base дозволяє робити прості візуалізації. Ал
 
 ```{r}
 #also png, pdf etc.
+jpeg("./rplot.jpg")
 
+data <- as.matrix(mtcars)
 # heatmap displays numbers as degree of color transition throughout a color pallet.
+heatmap(data, col = heat.colors(10)) + 
+    legend(x = "bottomright", legend = c("min","ave","max"), fill = heat.colors(3) )
 # a dendrogram is automatically add (displays resembling samples).
 
 # a good practice is to add a key to color ranges. 
@@ -290,8 +334,12 @@ R base дозволяє робити прості візуалізації. Ал
 
 ```{r}
 #load the package
-
+library(ggplot2)
 # blank plot
+ggplot(mtcars, aes(x = wt, y = mpg)) + 
+    geom_point()
+
+
 
 ```
 
@@ -309,19 +357,34 @@ R base дозволяє робити прості візуалізації. Ал
 ```{r}
 #Run whole chank.
 #scatter plot
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+    geom_point(aes(color = mpg)) + scale_colour_gradient(low = "yellow", high = "red", na.value = "black")
+
+
+#scatter plot
+ggplot(mtcars, aes(x = wt, y = mpg,color = mpg)) +
+    geom_point() + scale_colour_gradient(low = "yellow", high = "red", na.value = "black")
+
 
 #scale_colour_gradient() gives color scale to chosen variable
 ```
 
 ```{r}
 #box plot
+boxplot(ToothGrowth$supp,ToothGrowth$len)
+ToothGrowth$len
+ToothGrowth$supp
+ggplot(ToothGrowth, aes(x = supp, y = len)) + geom_boxplot()
+
+ggplot(ToothGrowth, aes(x = interaction(supp,len), y = len)) + geom_boxplot()
 
 ```
 
 ```{r}
 #curve
 
-
+myfun <- function(xvar) {1/(1+exp(-xvar+10))}
+ggplot(data.frame(x = c(0,20)), aes(x=x )) + stat_function(fun = myfun(x), geom = "point")
 ```
 
 **Гарно, чи не так!?**
@@ -331,9 +394,9 @@ R base дозволяє робити прості візуалізації. Ал
 
 ```{r}
 #bar plot
-
+ggplot(BOD, aes(x = Time, y = demand)) + geom_col()
 # Save the plot to a pdf
-
+ggsave("myplot.pdf")
 ```
 
 
@@ -360,10 +423,11 @@ VS
 
 ```{r}
 #install Tidyverse
-
+library(tidyverse)
 
 #if problems arise, load dplyr and readr
-
+library(readr)
+library(dplyr)
 ```
 
 Зверніть увагу: якщо у вас виникли проблеми з інсталяцією *tidyverse*, блоки коду, які вимагають функцій поза завантаженими на початку семінару, позначені *#!*.
@@ -374,14 +438,15 @@ VS
 #!
 # Display list of tidyverse packages.
 # Note, ggplot2 is also part of tidyverse
-
+tidyverse_packages()
 ```
 
 Оператор pipe **%>%** (з пакета *dplyr*) передає вихідні дані функції, застосовані до першого аргументу наступній функції. Такий спосіб об’єднання функцій дозволяє об’єднати декілька кроків одночасно, виконувати послідовні завдання.
 
 ```{r}
 #Pass vector c(1,2,3,4,5) to the function mean()
-
+a <- 1:5 %>% mean() 
+a
 ```
 
 Пакет *readr* спрощує читання або запис кількох форматів файлів за допомогою функцій, які починаються з read_* або write_*.
@@ -389,12 +454,12 @@ VS
 
 ```{r}
 # mtcars.csv file we created above (see "Save/write and load/read data" section).
-
+my_file <- read_tsv("mtcars.tsv")
 ```
 
 ```{r}
 # Analogically to base R, read_tsv reads .tsv files.
-
+write_csv(my_file, "my_file.csv")
 ```
 
 ```{r}
@@ -404,11 +469,15 @@ VS
 
 Імпортовані таблиці належать до класу **tibble**, сучасної версії data.frame з пакету *tibble*. Він ніколи не змінює тип вхідних даних (тобто більше не треба прописувати stringsAsFactors = FALSE).
 ```{r}
+matrix2 <- matrix(c(1,2,3,4), ncol = 2)
+as_tibble(matrix2)
+
 
 ```
 
 І можна використовувати колонки з списками.
 ```{r}
+vignette("tibble")
 
 ```
 Дізнайтеся більше про tibble за допомогою vignette("tibble").
@@ -417,6 +486,8 @@ VS
 
 ```{r}
 #Select and rename.
+mtcars_sel_renm <- mtcars %>% select(mpg) %>% rename(col1=mpg)
+mtcars_sel_renm
 
 ```
 
@@ -424,6 +495,8 @@ VS
 #Filter and sort.
 # filter(data, condition1, condition2,...)
 # arrange(col) ascending, arrange(-col) descending
+mtcars_fill_sort <- filter(mtcars, cyl == 4, disp > 100) %>% arrange(qsec)
+mtcars_fill_sort
 
 ```
 
@@ -431,6 +504,8 @@ VS
 # Group and summarize.
 #group_by() takes an existing tbl and converts it into a grouped tbl where operations are performed "by group"
 #summarise() creates a new data frame. It will contain one column for each grouping variable and one column for each of the summary statistics that you have specified.
+by_cyl <- mtcars %>% group_by(cyl) 
+
 
 ```
 
