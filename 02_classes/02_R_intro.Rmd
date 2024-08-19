@@ -504,14 +504,16 @@ mtcars_fill_sort
 # Group and summarize.
 #group_by() takes an existing tbl and converts it into a grouped tbl where operations are performed "by group"
 #summarise() creates a new data frame. It will contain one column for each grouping variable and one column for each of the summary statistics that you have specified.
-by_cyl <- mtcars %>% group_by(cyl) 
-
+by_cyl <- mtcars %>% group_by(cyl) %>%  summarise(disp = mean(disp), hp = mean(hp))
+by_cyl
 
 ```
 
 ```{r}
 # Mutate
 #mutate() creates new columns that are functions of existing variables. It can also modify (if the name is the same as an existing column) and delete columns (by setting their value to NULL).
+mtcars_mutate <- mtcars %>% select(carb,qsec) %>% mutate(new_col = carb/mean(qsec))
+head(mtcars_mutate)
 
 ```
 

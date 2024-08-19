@@ -36,6 +36,7 @@ library(RColorBrewer)
 library(DESeq2) # bioc
 library(pheatmap) # R
 library(DEGreport) # bioc
+#BiocManager::install("tximport")
 library(tximport) # bioc
 library(ggplot2) 
 library(ggrepel) #r
@@ -45,6 +46,7 @@ library(ggplotify)#r
 library(writexl) #r
 
 library(clusterProfiler) #bioc
+#BiocManager::install("org.Mm.eg.db")
 library(org.Mm.eg.db) # bioc
 
 ggplot2::theme_set(theme_light(base_size = 14))
@@ -181,8 +183,8 @@ fitting model and testing
 *Here we subset protein coding genes*.
 ```{r include = FALSE}
 ## Create DESeq2Dataset object
-dds_file <- "../../data/dds.RDS"
-
+#dds_file <- "../../data/dds.RDS"
+dds_file <- "dds.RDS"
 if (file.exists(dds_file)){
     dds <- readRDS(dds_file)
 }else{
