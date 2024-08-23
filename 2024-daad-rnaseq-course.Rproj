@@ -1,6 +1,9 @@
 Version: 1.0
 
+<<<<<<< Updated upstream
 <<<<<<< HEAD
+=======
+>>>>>>> Stashed changes
 RestoreWorkspace: Default
 SaveWorkspace: Default
 AlwaysSaveHistory: Default
@@ -8,6 +11,7 @@ AlwaysSaveHistory: Default
 EnableCodeIndexing: Yes
 UseSpacesForTab: Yes
 NumSpacesForTab: 4
+<<<<<<< Updated upstream
 =======
 RestoreWorkspace: No
 SaveWorkspace: No
@@ -17,6 +21,8 @@ EnableCodeIndexing: Yes
 UseSpacesForTab: Yes
 NumSpacesForTab: 2
 >>>>>>> 5d03b6fa2e55b20307b157b3c44e1b34dad1ae95
+=======
+>>>>>>> Stashed changes
 Encoding: UTF-8
 
 RnwWeave: Sweave
